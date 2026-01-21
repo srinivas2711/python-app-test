@@ -33,21 +33,23 @@ jobs:
           
       - name: Create virtual environment and install dependencies
         run: |
-          python -m venv antenv
-          source antenv/bin/activate
+          python -m venv venv
+          source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Upload build artifact
+      - name: Prepare artifact
+        run: |
+          mkdir python-app
+          cp -r app/* python-app/
+          cp requirements.txt python-app/
+  
+      # 5️⃣ Upload artifact for deployment
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: webapp-package
-          path: |
-            app/
-            antenv/
-            requirements.txt
-            startup.sh
-          retention-days: 1
+          name: python-app
+          path: python-app/
 
   deploy-to-staging-slot:
     name: 🚀 Deploy to pre deployment Slot
@@ -55,10 +57,11 @@ jobs:
     needs: build
 
     steps:
-      - name: Download build artifact
+      # 1️⃣ Download the artifact into a known folder
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: webapp-package
+          name: python-app
           path: ./package
 
       - name: Azure login with Service Principal
@@ -191,6 +194,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
