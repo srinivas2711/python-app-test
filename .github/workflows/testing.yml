@@ -2,7 +2,7 @@ name: Azure Web App Slot Deployment
 
 on:
   push:
-    branches: [develop, feature/silambarasan/mcp-prod-deploy]
+    branches: [main, feature/testing]
   workflow_dispatch:
     inputs:
       skip_health_check:
@@ -56,13 +56,13 @@ jobs:
       - name: Azure login with Service Principal
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ github.ref_name == 'feature/testing' && env.PROD_CREDS || env.DEV_CREDS }}
 
       - name: Deploy to Staging Slot
         uses: azure/webapps-deploy@v3
         with:
-          app-name: python-app-test
-          slot-name: production
+          app-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }}
+          slot-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }}
           package: ./package
 
       - name: Logout from Azure
@@ -81,7 +81,7 @@ jobs:
       - name: Health Check - Staging Slot
         id: health_check
         run: |
-          HEALTH_URL="${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.HEALTH_CHECK_URL_PRE_STG || vars.HEALTH_CHECK_URL_PRE_DEV }}"
+          HEALTH_URL="${{ github.ref_name == 'feature/testing' && vars.HEALTH_CHECK_URL_PRE_STG || vars.HEALTH_CHECK_URL_PRE_DEV }}"
           echo "Checking health at: $HEALTH_URL"
 
           MAX_RETRIES=20
@@ -118,7 +118,7 @@ jobs:
           echo "## 🏥 Slot Health Check Summary" >> $GITHUB_STEP_SUMMARY
           echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Staging URL | ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.HEALTH_CHECK_URL_PRE_STG || vars.HEALTH_CHECK_URL_PRE_DEV }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Staging URL | ${{ github.ref_name == 'feature/testing' && vars.HEALTH_CHECK_URL_PRE_STG || vars.HEALTH_CHECK_URL_PRE_DEV }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Status | ✅ Healthy |" >> $GITHUB_STEP_SUMMARY
 
   manual-approval:
@@ -144,15 +144,15 @@ jobs:
       - name: Azure login with Service Principal
         uses: azure/login@v1
         with:
-          creds: ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && env.PROD_CREDS || env.DEV_CREDS }}
+          creds: ${{ github.ref_name == 'feature/testing' && env.PROD_CREDS || env.DEV_CREDS }}
 
       - name: Swap Staging to Production
         run: |
           echo "🔄 Initiating slot swap..."
           az webapp deployment slot swap \
-            --resource-group ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.AZURE_RESOURCE_GROUP_STG || vars.AZURE_RESOURCE_GROUP_NON_PROD }} \
-            --name ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }} \
-            --slot ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }} \
+            --resource-group ${{ github.ref_name == 'feature/testing' && vars.AZURE_RESOURCE_GROUP_STG || vars.AZURE_RESOURCE_GROUP_NON_PROD }} \
+            --name ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }} \
+            --slot ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }} \
             --target-slot production
 
           echo "✅ Slot swap completed successfully!"
@@ -162,7 +162,7 @@ jobs:
           echo "Verifying production health..."
           sleep 10
 
-          PROD_URL="${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.HEALTH_CHECK_URL_STG || vars.HEALTH_CHECK_URL_DEV }}"
+          PROD_URL="${{ github.ref_name == 'feature/testing' && vars.HEALTH_CHECK_URL_STG || vars.HEALTH_CHECK_URL_DEV }}"
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL" || echo "000")
 
           if [ "$HTTP_STATUS" -eq 200 ]; then
@@ -176,8 +176,8 @@ jobs:
           echo "## 🎉 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Web App | ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Production URL | ${{ github.ref_name == 'feature/silambarasan/mcp-prod-deploy' && vars.HEALTH_CHECK_URL_STG || vars.HEALTH_CHECK_URL_DEV }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Web App | ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Production URL | ${{ github.ref_name == 'feature/testing' && vars.HEALTH_CHECK_URL_STG || vars.HEALTH_CHECK_URL_DEV }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Deployed By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
 
