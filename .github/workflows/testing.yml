@@ -62,7 +62,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'python-app-test'
-          slot-name: 'production'
+          slot-name: 'staging'
           package: ./package
 
       - name: Logout from Azure
