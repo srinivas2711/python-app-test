@@ -61,8 +61,8 @@ jobs:
       - name: Deploy to Staging Slot
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'python-app-test'
-          slot-name: 'staging'
+          app-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }}
+          slot-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }}
           package: ./package
 
       - name: Logout from Azure
@@ -183,6 +183,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
