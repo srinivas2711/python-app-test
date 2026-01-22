@@ -51,19 +51,22 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: webapp-package
-          path: .
+          path: ./package
 
       - name: Azure login with Service Principal
         uses: azure/login@v1
         with:
           creds: ${{ github.ref_name == 'feature/testing' && env.PROD_CREDS || env.DEV_CREDS }}
+    
+      - name: Fix startup.sh permissions
+        run: chmod +x ./package/webapp-package/startup.sh
 
       - name: Deploy to Staging Slot
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }}
           slot-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }}
-          package: ./webapp-package
+          package: ./package/webapp-package
 
       - name: Logout from Azure
         run: az logout
@@ -183,6 +186,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
