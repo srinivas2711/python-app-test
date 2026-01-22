@@ -51,7 +51,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: webapp-package
-          package: ./webapp-package
+          path: ./package
 
       - name: Azure login with Service Principal
         uses: azure/login@v1
@@ -63,7 +63,7 @@ jobs:
         with:
           app-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }}
           slot-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }}
-          package: ./package
+          package: ./package/
 
       - name: Logout from Azure
         run: az logout
@@ -183,5 +183,6 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
