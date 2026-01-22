@@ -30,14 +30,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-          
-      - name: Create virtual environment and install dependencies
-        run: |
-          python -m venv antenv
-          source antenv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          deactivate
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -46,6 +38,7 @@ jobs:
           path: |
             app/
             requirements.txt
+            startup.sh
           retention-days: 1
 
   deploy-to-staging-slot:
@@ -190,6 +183,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
