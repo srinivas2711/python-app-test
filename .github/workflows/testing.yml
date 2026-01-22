@@ -46,7 +46,6 @@ jobs:
           path: |
             app/
             requirements.txt
-            startup.sh
           retention-days: 1
 
   deploy-to-staging-slot:
@@ -191,6 +190,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
