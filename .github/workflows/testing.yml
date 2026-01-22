@@ -59,7 +59,7 @@ jobs:
           creds: ${{ github.ref_name == 'feature/testing' && env.PROD_CREDS || env.DEV_CREDS }}
     
       - name: Fix startup.sh permissions
-        run: chmod +x ./package/webapp-package/startup.sh
+        run: chmod +x ./package/startup.sh
 
       - name: Deploy to Staging Slot
         uses: azure/webapps-deploy@v3
@@ -186,6 +186,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
