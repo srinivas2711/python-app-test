@@ -61,6 +61,7 @@ jobs:
         with:
           app-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }}
           slot-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }}
+          package: ./python-app
 
       - name: Logout from Azure
         run: az logout
@@ -180,6 +181,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
