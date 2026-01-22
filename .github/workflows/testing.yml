@@ -51,7 +51,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: webapp-package
-          path: ./package
+          package: ./package
 
       - name: Azure login with Service Principal
         uses: azure/login@v1
@@ -183,3 +183,4 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
