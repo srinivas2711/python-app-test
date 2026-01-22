@@ -52,6 +52,9 @@ jobs:
           name: python-app
           path: .
 
+      - name: List artifact contents
+        run: ls -R
+    
       - name: Azure login with Service Principal
         uses: azure/login@v1
         with:
@@ -182,6 +185,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
