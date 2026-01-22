@@ -45,7 +45,6 @@ jobs:
           name: webapp-package
           path: |
             app/
-            antenv/
             requirements.txt
             startup.sh
           retention-days: 1
@@ -192,6 +191,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
