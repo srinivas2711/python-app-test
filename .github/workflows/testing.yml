@@ -67,7 +67,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: python-app-test
-          slot-name: dev
+          slot-name: staging
           package: .
   
       - name: Set custom startup script
@@ -203,6 +203,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
