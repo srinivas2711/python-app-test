@@ -75,7 +75,7 @@ jobs:
           az webapp config set \
             --name python-app-test \
             --resource-group python-app-test-rg \
-            --slot dev \
+            --slot staging \
             --startup-file "/home/site/wwwroot/startup.sh"
 
       - name: Restart Azure Web App
@@ -83,7 +83,7 @@ jobs:
           az webapp restart \
             --name python-app-test \
             --resource-group python-app-test-rg \
-            --slot dev
+            --slot staging
 
       - name: Logout from Azure
         run: az logout
@@ -203,6 +203,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
