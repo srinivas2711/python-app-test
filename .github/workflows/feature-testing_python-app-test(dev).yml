@@ -5,9 +5,6 @@
 name: Build and deploy Python app to Azure Web App - python-app-test
 
 on:
-  push:
-    branches:
-      - feature/testing
   workflow_dispatch:
 
 jobs:
@@ -63,4 +60,5 @@ jobs:
         with:
           app-name: 'python-app-test'
           slot-name: 'dev'
+
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_72F10F95D23E437487DDF02FA3CF7692 }}
