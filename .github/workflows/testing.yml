@@ -54,6 +54,9 @@ jobs:
 
       - name: List artifact contents
         run: ls -R
+
+      - name: Make startup script executable
+        run: chmod +x startup.sh
     
       - name: Azure login with Service Principal
         uses: azure/login@v1
@@ -66,6 +69,21 @@ jobs:
           app-name: python-app-test
           slot-name: dev
           package: .
+  
+      - name: Set custom startup script
+        run: |
+          az webapp config set \
+            --name python-app-test \
+            --resource-group python-app-test-rg \
+            --slot dev \
+            --startup-file "/home/site/wwwroot/startup.sh"
+
+      - name: Restart Azure Web App
+        run: |
+          az webapp restart \
+            --name python-app-test \
+            --resource-group python-app-test-rg \
+            --slot dev
 
       - name: Logout from Azure
         run: az logout
@@ -185,6 +203,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
