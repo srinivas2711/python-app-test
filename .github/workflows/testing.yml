@@ -37,7 +37,8 @@ jobs:
           name: python-app
           path: |
             app/
-            .
+            requirements.txt
+            startup.sh
           retention-days: 1
 
   deploy-to-staging-slot:
@@ -52,9 +53,6 @@ jobs:
           name: python-app
           path: .
 
-      - name: List artifact contents
-        run: ls -R
-
       - name: Make startup script executable
         run: chmod +x startup.sh
     
@@ -66,24 +64,9 @@ jobs:
       - name: Deploy to Staging Slot
         uses: azure/webapps-deploy@v3
         with:
-          app-name: python-app-test
-          slot-name: staging
+          app-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_NAME_STG || vars.AZURE_WEBAPP_NAME_DEV }}
+          slot-name: ${{ github.ref_name == 'feature/testing' && vars.AZURE_WEBAPP_SLOT_NAME_STG || vars.AZURE_WEBAPP_SLOT_NAME_DEV }}
           package: .
-  
-      - name: Set custom startup script
-        run: |
-          az webapp config set \
-            --name python-app-test \
-            --resource-group python-app-test-rg \
-            --slot staging \
-            --startup-file "/home/site/wwwroot/startup.sh"
-
-      - name: Restart Azure Web App
-        run: |
-          az webapp restart \
-            --name python-app-test \
-            --resource-group python-app-test-rg \
-            --slot staging
 
       - name: Logout from Azure
         run: az logout
@@ -96,7 +79,7 @@ jobs:
 
     steps:
       - name: Wait for application warmup
-        run: sleep 120
+        run: sleep 15
 
       - name: Health Check - Staging Slot
         id: health_check
@@ -203,6 +186,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
