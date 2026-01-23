@@ -8,4 +8,4 @@ echo "Installing dependencies..."
 pip install --no-cache-dir -r requirements.txt
 
 echo "Starting Gunicorn..."
-exec gunicorn app.main:app --workers 2
+python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
