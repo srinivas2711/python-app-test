@@ -37,7 +37,7 @@ jobs:
           name: python-app
           path: |
             app/
-            requirements.txt
+            .
           retention-days: 1
 
   deploy-to-staging-slot:
@@ -203,6 +203,7 @@ jobs:
 
       - name: Logout from Azure
         run: az logout
+
 
 
 
